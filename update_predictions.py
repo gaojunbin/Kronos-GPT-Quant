@@ -1,9 +1,11 @@
 import gc
+import json
 import os
 import re
 import subprocess
 import time
 from datetime import datetime, timezone, timedelta
+import pytz
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -18,7 +20,7 @@ from model import KronosTokenizer, Kronos, KronosPredictor
 Config = {
     "REPO_PATH": Path(__file__).parent.resolve(),
     "MODEL_PATH": "../Kronos_model",
-    "SYMBOL": 'BTCUSDT',
+    "SYMBOLS": ['BNBUSDT', 'ETHUSDT', 'BTCUSDT', 'SOLUSDT', 'DOGEUSDT', 'ADAUSDT'],  # 多币种配置
     "INTERVAL": '1h',
     "HIST_POINTS": 360,
     "PRED_HORIZON": 24,
@@ -75,9 +77,9 @@ def make_prediction(df, predictor):
     return close_preds_main, volume_preds_main, close_preds_volatility
 
 
-def fetch_binance_data():
-    """Fetches K-line data from the Binance public API."""
-    symbol, interval = Config["SYMBOL"], Config["INTERVAL"]
+def fetch_binance_data(symbol):
+    """Fetches K-line data from the Binance public API for a specific symbol."""
+    interval = Config["INTERVAL"]
     limit = Config["HIST_POINTS"] + Config["VOL_WINDOW"]
 
     print(f"Fetching {limit} bars of {symbol} {interval} data from Binance...")
@@ -96,7 +98,7 @@ def fetch_binance_data():
     for col in ['open', 'high', 'low', 'close', 'volume', 'amount']:
         df[col] = pd.to_numeric(df[col])
 
-    print("Data fetched successfully.")
+    print(f"Data for {symbol} fetched successfully.")
     return df
 
 
@@ -129,9 +131,9 @@ def calculate_metrics(hist_df, close_preds_df, v_close_preds_df):
     return upside_prob, vol_amp_prob
 
 
-def create_plot(hist_df, close_preds_df, volume_preds_df):
-    """Generates and saves a comprehensive forecast chart."""
-    print("Generating comprehensive forecast chart...")
+def create_plot(hist_df, close_preds_df, volume_preds_df, symbol):
+    """Generates and saves a comprehensive forecast chart for a specific symbol."""
+    print(f"Generating comprehensive forecast chart for {symbol}...")
     # plt.style.use('seaborn-v0_8-whitegrid')
     fig, (ax1, ax2) = plt.subplots(
         2, 1, figsize=(15, 10), sharex=True,
@@ -146,7 +148,7 @@ def create_plot(hist_df, close_preds_df, volume_preds_df):
     mean_preds = close_preds_df.mean(axis=1)
     ax1.plot(pred_time, mean_preds, color='darkorange', linestyle='-', label='Mean Forecast')
     ax1.fill_between(pred_time, close_preds_df.min(axis=1), close_preds_df.max(axis=1), color='darkorange', alpha=0.2, label='Forecast Range (Min-Max)')
-    ax1.set_title(f'{Config["SYMBOL"]} Probabilistic Price & Volume Forecast (Next {Config["PRED_HORIZON"]} Hours)', fontsize=16, weight='bold')
+    ax1.set_title(f'{symbol} Probabilistic Price & Volume Forecast (Next {Config["PRED_HORIZON"]} Hours)', fontsize=16, weight='bold')
     ax1.set_ylabel('Price (USDT)')
     ax1.legend()
     ax1.grid(True, which='both', linestyle='--', linewidth=0.5)
@@ -154,7 +156,7 @@ def create_plot(hist_df, close_preds_df, volume_preds_df):
     ax2.bar(hist_time, hist_df['volume'], color='skyblue', label='Historical Volume', width=0.03)
     ax2.bar(pred_time, volume_preds_df.mean(axis=1), color='sandybrown', label='Mean Forecasted Volume', width=0.03)
     ax2.set_ylabel('Volume')
-    ax2.set_xlabel('Time (UTC)')
+    ax2.set_xlabel('Time (SGT)')
     ax2.legend()
     ax2.grid(True, which='both', linestyle='--', linewidth=0.5)
 
@@ -164,10 +166,35 @@ def create_plot(hist_df, close_preds_df, volume_preds_df):
         ax.tick_params(axis='x', rotation=30)
 
     fig.tight_layout()
-    chart_path = Config["REPO_PATH"] / 'prediction_chart.png'
+    charts_dir = Config["REPO_PATH"] / 'charts'
+    charts_dir.mkdir(exist_ok=True)
+    chart_path = charts_dir / f'prediction_chart_{symbol}.png'
     fig.savefig(chart_path, dpi=120)
     plt.close(fig)
     print(f"Chart saved to: {chart_path}")
+    return chart_path
+
+
+def update_html_predictions_data(predictions_data):
+    """直接更新HTML文件中的predictionsData"""
+    html_path = Config["REPO_PATH"] / 'index.html'
+
+    with open(html_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # 将预测数据转换为JavaScript格式
+    js_data = json.dumps(predictions_data, ensure_ascii=False, indent=12)
+
+    # 使用正则表达式替换predictionsData
+    pattern = r'(let predictionsData = ){.*?}(\s*;)'
+    replacement = f'\\g<1>{js_data}\\g<2>'
+
+    content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+    print(f"HTML中的预测数据已更新")
 
 
 def update_html(upside_prob, vol_amp_prob):
@@ -177,7 +204,9 @@ def update_html(upside_prob, vol_amp_prob):
     """
     print("Updating index.html...")
     html_path = Config["REPO_PATH"] / 'index.html'
-    now_utc_str = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+    # 使用新加坡时间
+    singapore_tz = pytz.timezone('Asia/Singapore')
+    now_sgt_str = datetime.now(singapore_tz).strftime('%Y-%m-%d %H:%M:%S')
     upside_prob_str = f'{upside_prob:.1%}'
     vol_amp_prob_str = f'{vol_amp_prob:.1%}'
 
@@ -187,7 +216,7 @@ def update_html(upside_prob, vol_amp_prob):
     # Robustly replace content using lambda functions
     content = re.sub(
         r'(<strong id="update-time">).*?(</strong>)',
-        lambda m: f'{m.group(1)}{now_utc_str}{m.group(2)}',
+        lambda m: f'{m.group(1)}{now_sgt_str}{m.group(2)}',
         content
     )
     content = re.sub(
@@ -226,33 +255,79 @@ def git_commit_and_push(commit_message):
 
 
 def main_task(model):
-    """Executes one full update cycle."""
-    print("\n" + "=" * 60 + f"\nStarting update task at {datetime.now(timezone.utc)}\n" + "=" * 60)
-    df_full = fetch_binance_data()
-    df_for_model = df_full.iloc[:-1]
+    """执行一次完整的多币种预测更新周期"""
+    singapore_start_time = datetime.now(pytz.timezone('Asia/Singapore'))
+    print("\n" + "=" * 60 + f"\n开始多币种预测任务 at {singapore_start_time} SGT\n" + "=" * 60)
 
-    close_preds, volume_preds, v_close_preds = make_prediction(df_for_model, model)
+    # 获取新加坡时间
+    singapore_tz = pytz.timezone('Asia/Singapore')
+    singapore_time = datetime.now(singapore_tz).strftime('%Y-%m-%d %H:%M:%S')
 
-    hist_df_for_plot = df_for_model.tail(Config["HIST_POINTS"])
-    hist_df_for_metrics = df_for_model.tail(Config["VOL_WINDOW"])
+    predictions_data = {
+        "last_updated": singapore_time,
+        "symbols": {}
+    }
 
-    upside_prob, vol_amp_prob = calculate_metrics(hist_df_for_metrics, close_preds, v_close_preds)
-    create_plot(hist_df_for_plot, close_preds, volume_preds)
-    update_html(upside_prob, vol_amp_prob)
+    # 处理每个币种
+    for symbol in Config["SYMBOLS"]:
+        print(f"\n--- 处理币种: {symbol} ---")
+        try:
+            # 获取数据
+            df_full = fetch_binance_data(symbol)
+            df_for_model = df_full.iloc[:-1]
 
-    commit_message = f"Auto-update forecast for {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC"
-    git_commit_and_push(commit_message)
+            # 预测
+            close_preds, volume_preds, v_close_preds = make_prediction(df_for_model, model)
 
-    # --- 新增的内存清理步骤 ---
-    # 显式删除大的DataFrame对象，帮助垃圾回收器
-    del df_full, df_for_model, close_preds, volume_preds, v_close_preds
-    del hist_df_for_plot, hist_df_for_metrics
+            # 准备数据
+            hist_df_for_plot = df_for_model.tail(Config["HIST_POINTS"])
+            hist_df_for_metrics = df_for_model.tail(Config["VOL_WINDOW"])
 
-    # 强制执行垃圾回收
-    gc.collect()
-    # --- 内存清理结束 ---
+            # 计算指标
+            upside_prob, vol_amp_prob = calculate_metrics(hist_df_for_metrics, close_preds, v_close_preds)
 
-    print("-" * 60 + "\n--- Task completed successfully ---\n" + "-" * 60 + "\n")
+            # 生成图表
+            chart_path = create_plot(hist_df_for_plot, close_preds, volume_preds, symbol)
+
+            # 保存预测数据
+            predictions_data["symbols"][symbol] = {
+                "upside_prob": f"{upside_prob:.1%}",
+                "vol_amp_prob": f"{vol_amp_prob:.1%}",
+                "chart_file": f"charts/prediction_chart_{symbol}.png"
+            }
+
+            print(f"{symbol} 预测完成: 上涨概率 {upside_prob:.1%}, 波动性放大概率 {vol_amp_prob:.1%}")
+
+            # 清理内存
+            del df_full, df_for_model, close_preds, volume_preds, v_close_preds
+            del hist_df_for_plot, hist_df_for_metrics
+            gc.collect()
+
+        except Exception as e:
+            print(f"处理 {symbol} 时发生错误: {e}")
+            predictions_data["symbols"][symbol] = {
+                "upside_prob": "N/A",
+                "vol_amp_prob": "N/A",
+                "chart_file": None,
+                "error": str(e)
+            }
+
+    # 直接更新HTML中的预测数据
+    update_html_predictions_data(predictions_data)
+
+    # 为向后兼容，仍然更新HTML中的时间戳和第一个币种的数据
+    first_symbol = Config["SYMBOLS"][0]
+    if first_symbol in predictions_data["symbols"] and "error" not in predictions_data["symbols"][first_symbol]:
+        # 从百分比字符串转换回数字
+        upside_str = predictions_data["symbols"][first_symbol]["upside_prob"]
+        vol_amp_str = predictions_data["symbols"][first_symbol]["vol_amp_prob"]
+        upside_prob = float(upside_str.rstrip('%')) / 100
+        vol_amp_prob = float(vol_amp_str.rstrip('%')) / 100
+        update_html(upside_prob, vol_amp_prob)
+
+    singapore_time_end = datetime.now(singapore_tz)
+    print(f"\n多币种预测完成 {singapore_time_end:%Y-%m-%d %H:%M} SGT")
+    print("-" * 60 + "\n--- 任务成功完成 ---\n" + "-" * 60 + "\n")
 
 
 def run_scheduler(model):
@@ -263,8 +338,10 @@ def run_scheduler(model):
         sleep_seconds = (next_run_time - now).total_seconds()
 
         if sleep_seconds > 0:
-            print(f"Current time: {now:%Y-%m-%d %H:%M:%S UTC}.")
-            print(f"Next run at: {next_run_time:%Y-%m-%d %H:%M:%S UTC}. Waiting for {sleep_seconds:.0f} seconds...")
+            now_sgt = now.astimezone(pytz.timezone('Asia/Singapore'))
+            next_run_sgt = next_run_time.astimezone(pytz.timezone('Asia/Singapore'))
+            print(f"Current time: {now_sgt:%Y-%m-%d %H:%M:%S SGT}.")
+            print(f"Next run at: {next_run_sgt:%Y-%m-%d %H:%M:%S SGT}. Waiting for {sleep_seconds:.0f} seconds...")
             time.sleep(sleep_seconds)
 
         try:
