@@ -1,0 +1,83 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv
+
+# 环境变量和配置
+.env
+.env.local
+.env.*.local
+
+# 数据和日志
+data/
+logs/
+*.log
+strategy_logs/
+
+# 模型文件（如果很大）
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+models/
+checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
+
+# 临时文件
+*.tmp
+*.bak
+*.cache
+tmp/
+temp/
+
+# 图表输出（如果不需要版本控制）
+# charts/*.png
+
+# 系统文件
+Thumbs.db
+.DS_Store

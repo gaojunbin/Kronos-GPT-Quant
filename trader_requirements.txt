@@ -1,0 +1,31 @@
+# Kronos交易系统依赖包
+
+# 现有的Kronos预测系统依赖
+torch
+numpy
+pandas
+matplotlib
+python-binance
+huggingface_hub
+safetensors>=0.4.3
+tqdm
+pytz
+
+einops>=0.6.0
+
+# 新增的交易系统依赖
+python-dotenv>=0.19.0
+requests>=2.28.0
+openai>=1.0.0
+
+# 日志和配置
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# WebUI 依赖
+fastapi>=0.104.0
+uvicorn>=0.24.0
+websockets>=12.0
+
+# 可选的通知功能
+# telegram-send  # 如需Telegram通知可取消注释

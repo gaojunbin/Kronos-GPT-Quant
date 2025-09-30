@@ -1,0 +1,378 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #3b82f6;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --bg-hover: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    animation: pulse 2s infinite;
+}
+
+.status-badge.connected .status-dot {
+    background: var(--success-color);
+}
+
+.status-badge.error .status-dot {
+    background: var(--danger-color);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Dashboard Grid */
+.dashboard {
+    display: grid;
+    gap: 20px;
+}
+
+.panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.panel h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+/* Overview Panel */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: var(--bg-dark);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.info-row {
+    display: flex;
+    gap: 30px;
+    padding: 16px;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.info-item {
+    display: flex;
+    gap: 8px;
+}
+
+.info-label {
+    color: var(--text-secondary);
+}
+
+/* Risk Panel */
+.risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.risk-item {
+    background: var(--bg-dark);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.risk-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.risk-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+    transition: width 0.3s ease;
+}
+
+.progress-fill.warning {
+    background: linear-gradient(90deg, var(--warning-color), var(--danger-color));
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.data-table thead {
+    background: var(--bg-dark);
+}
+
+.data-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--text-secondary);
+}
+
+/* Action Badges */
+.action-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.action-badge.buy {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+}
+
+.action-badge.sell {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger-color);
+}
+
+.action-badge.hold {
+    background: rgba(148, 163, 184, 0.2);
+    color: var(--text-secondary);
+}
+
+/* Status Badges */
+.status-badge-small {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge-small.success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success-color);
+}
+
+.status-badge-small.failed {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger-color);
+}
+
+/* Probability Colors */
+.prob-high {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.prob-medium {
+    color: var(--warning-color);
+    font-weight: 600;
+}
+
+.prob-low {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+/* Logs Container */
+.logs-container {
+    max-height: 400px;
+    overflow-y: auto;
+    background: var(--bg-dark);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.log-entry {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-timestamp {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.log-message {
+    margin-top: 4px;
+}
+
+.log-entry.info .log-message {
+    color: var(--primary-color);
+}
+
+.log-entry.success .log-message {
+    color: var(--success-color);
+}
+
+.log-entry.error .log-message {
+    color: var(--danger-color);
+}
+
+.log-entry.warning .log-message {
+    color: var(--warning-color);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-hover);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .overview-grid,
+    .risk-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .data-table {
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px;
+    }
+}

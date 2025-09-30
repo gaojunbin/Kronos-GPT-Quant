@@ -1,46 +1,60 @@
 version: '3.8'
 
 services:
-  kronos-demo:
-    build: .
-    container_name: kronos-prediction-service
+  kronos-trader:
+    build:
+      context: .
+      dockerfile: Dockerfile.trader
+    container_name: kronos-trader-service
     restart: unless-stopped
     volumes:
       # 挂载整个项目目录到容器
       - .:/app
+      # 单独挂载日志目录（持久化）
+      - trader-logs:/app/logs
     environment:
       # 设置时区
       - TZ=Asia/Singapore
-      # 如果需要代理设置
-      # - HTTP_PROXY=http://proxy:port
-      # - HTTPS_PROXY=http://proxy:port
+      # 从.env文件读取环境变量
+    env_file:
+      - .env
     networks:
       - kronos-network
-    # 如果需要web服务，可以开启端口映射
-    # ports:
-    #   - "8000:8000"
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-  # 可选：nginx服务器提供静态文件访问
-  web-server:
-    image: nginx:alpine
-    container_name: kronos-web-server
+  # Kronos Trader WebUI 服务
+  kronos-trader-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.trader
+    container_name: kronos-trader-webui
+    restart: unless-stopped
+    command: python -m trader.webui_server
     ports:
-      - "24803:80"
+      - "12990:8000"
     volumes:
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./style.css:/usr/share/nginx/html/style.css:ro
-      - ./charts:/usr/share/nginx/html/charts:ro
-      - ./img:/usr/share/nginx/html/img:ro
-    depends_on:
-      - kronos-demo
+      - .:/app
+    environment:
+      - TZ=Asia/Singapore
+    env_file:
+      - .env
     networks:
       - kronos-network
-    restart: unless-stopped
+    depends_on:
+      - kronos-trader
 
 networks:
   kronos-network:
     driver: bridge
 
 volumes:
+  trader-logs:
+    driver: local
   model-cache:
     driver: local

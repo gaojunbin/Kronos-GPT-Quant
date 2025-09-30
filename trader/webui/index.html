@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kronos Trader - 交易监控面板</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 Kronos智能交易系统</h1>
+            <div class="status-badge" id="systemStatus">
+                <span class="status-dot"></span>
+                <span id="statusText">连接中...</span>
+            </div>
+        </header>
+
+        <div class="dashboard">
+            <!-- 系统概览 -->
+            <section class="panel overview-panel">
+                <h2>系统概览</h2>
+                <div class="overview-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">总资产价值</div>
+                        <div class="stat-value" id="totalValue">$0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">总运行次数</div>
+                        <div class="stat-value" id="totalRuns">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">成功交易</div>
+                        <div class="stat-value" id="successTrades">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">总交易量</div>
+                        <div class="stat-value" id="totalVolume">$0.00</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">上次执行:</span>
+                        <span id="lastRun">N/A</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">下次执行:</span>
+                        <span id="nextRun">N/A</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 风险指标 -->
+            <section class="panel risk-panel">
+                <h2>风险指标</h2>
+                <div class="risk-grid">
+                    <div class="risk-item">
+                        <div class="risk-label">总敞口</div>
+                        <div class="risk-value">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="exposureBar" style="width: 0%"></div>
+                            </div>
+                            <span id="exposureValue">0%</span>
+                        </div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">USDT储备</div>
+                        <div class="risk-value" id="usdtReserve">$0.00</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">持仓数量</div>
+                        <div class="risk-value" id="positionCount">0</div>
+                    </div>
+                    <div class="risk-item">
+                        <div class="risk-label">最大单仓</div>
+                        <div class="risk-value" id="maxPosition">$0.00</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 当前持仓 -->
+            <section class="panel positions-panel">
+                <h2>当前持仓</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>资产</th>
+                                <th>数量</th>
+                                <th>当前价格</th>
+                                <th>价值 (USDT)</th>
+                                <th>可用/锁定</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positionsTable">
+                            <tr>
+                                <td colspan="5" class="no-data">暂无持仓数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 预测数据 -->
+            <section class="panel predictions-panel">
+                <h2>价格预测</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>币种</th>
+                                <th>当前价格</th>
+                                <th>上涨概率</th>
+                                <th>高波动概率</th>
+                                <th>预测区间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="predictionsTable">
+                            <tr>
+                                <td colspan="5" class="no-data">暂无预测数据</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 交易历史 -->
+            <section class="panel trades-panel">
+                <h2>交易历史</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>币种</th>
+                                <th>操作</th>
+                                <th>数量</th>
+                                <th>价格</th>
+                                <th>金额</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tradesTable">
+                            <tr>
+                                <td colspan="7" class="no-data">暂无交易记录</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 策略日志 -->
+            <section class="panel logs-panel">
+                <h2>策略日志</h2>
+                <div class="logs-container" id="logsContainer">
+                    <div class="no-data">暂无日志</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

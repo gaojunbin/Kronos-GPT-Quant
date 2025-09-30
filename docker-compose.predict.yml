@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  kronos-demo:
+    build: .
+    container_name: kronos-prediction-service
+    restart: unless-stopped
+    volumes:
+      # 挂载整个项目目录到容器
+      - .:/app
+    environment:
+      # 设置时区
+      - TZ=Asia/Singapore
+      # 如果需要代理设置
+      # - HTTP_PROXY=http://proxy:port
+      # - HTTPS_PROXY=http://proxy:port
+    networks:
+      - kronos-network
+    # 如果需要web服务，可以开启端口映射
+    # ports:
+    #   - "8000:8000"
+
+  # 可选：nginx服务器提供静态文件访问
+  web-server:
+    image: nginx:alpine
+    container_name: kronos-web-server
+    ports:
+      - "24803:80"
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./style.css:/usr/share/nginx/html/style.css:ro
+      - ./charts:/usr/share/nginx/html/charts:ro
+      - ./img:/usr/share/nginx/html/img:ro
+    depends_on:
+      - kronos-demo
+    networks:
+      - kronos-network
+    restart: unless-stopped
+
+networks:
+  kronos-network:
+    driver: bridge
+
+volumes:
+  model-cache:
+    driver: local
