@@ -1,205 +1,207 @@
-# Kronos 智能交易系统
+# Kronos Intelligent Trading System
 
-基于Kronos价格预测模型和ChatGPT智能分析的加密货币自动交易系统。
+An automated cryptocurrency trading system powered by Kronos price prediction model and ChatGPT intelligent analysis.
 
-## 🌟 功能特性
+## 🌟 Features
 
-### 价格预测仪表板
-- **实时价格预测**: 对BTC、ETH、BNB、SOL、DOGE、ADA提供24小时概率预测
-- **交互式仪表板**: 基于Web的实时数据可视化界面
-- **多币种支持**: 可切换查看不同加密货币对
-- **概率指标**:
-  - 上涨概率（价格上涨的可能性）
-  - 波动性放大（预测波动性vs历史波动性）
+### Price Prediction Dashboard
+- **Real-time Price Forecasting**: 24-hour probabilistic predictions for BTC, ETH, BNB, SOL, DOGE, and ADA
+- **Interactive Dashboard**: Web-based real-time data visualization interface
+- **Multi-Currency Support**: Switch between different cryptocurrency pairs
+- **Probability Metrics**:
+  - Upside Probability (likelihood of price increase)
+  - Volatility Amplification (predicted vs historical volatility)
 
-### 智能交易系统 🤖
-- **AI价格预测**: 使用Kronos深度学习模型预测6个主流币种的价格走势
-- **智能决策**: 集成ChatGPT API，将预测结果转换为具体的交易信号
-- **风险控制**: 内置多层风险管理机制，包括仓位控制、止损等
-- **自动执行**: 每小时自动运行策略，无需人工干预
-- **完整日志**: 详细记录所有交易决策和执行过程
+### Intelligent Trading System 🤖
+- **AI Price Prediction**: Uses Kronos deep learning model to forecast price movements for 6 major cryptocurrencies
+- **Smart Decision Making**: Integrates ChatGPT API to convert predictions into actionable trading signals
+- **Risk Control**: Built-in multi-layer risk management including position sizing and stop-loss
+- **Automated Execution**: Runs strategy automatically every hour without manual intervention
+- **Comprehensive Logging**: Detailed records of all trading decisions and executions
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 预测仪表板
+### Prediction Dashboard
 
-#### 使用Docker（推荐）
+#### Using Docker (Recommended)
 
 ```bash
 docker-compose up -d
 ```
 
-#### 手动设置
+#### Manual Setup
 
-1. 安装依赖:
+1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. 运行预测更新器:
+2. Run prediction updater:
 ```bash
 python update_predictions.py
 ```
 
-3. 启动仪表板:
+3. Start dashboard:
 ```bash
 python -m http.server 8000
 ```
 
-访问 `http://localhost:8000` 查看仪表板。
+Access the dashboard at `http://localhost:8000`.
 
-### 智能交易系统
+### Intelligent Trading System
 
-#### 1. 安装交易系统依赖
+#### 1. Install Trading System Dependencies
 
 ```bash
 pip install -r trader_requirements.txt
 ```
 
-#### 2. 配置环境变量
+#### 2. Configure Environment Variables
 
-复制环境变量模板并填入你的API密钥：
+Copy the environment template and fill in your API keys:
 
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 文件，设置以下必需项：
+Edit the `.env` file and set the required fields:
 
 ```bash
-# 币安API (需要现货交易权限)
+# Binance API (spot trading permission required)
 BINANCE_API_KEY=your_binance_api_key
 BINANCE_API_SECRET=your_binance_api_secret
 
 # OpenAI API
 OPENAI_API_KEY=your_openai_api_key
 
-# 可选：启用模拟模式进行测试
+# Optional: Enable simulation mode for testing
 SIMULATION_MODE=true
 ```
 
-#### 3. 验证配置
+#### 3. Verify Configuration
 
-运行配置检查：
+Run configuration check:
 
 ```bash
 python run_trader.py --config
 ```
 
-#### 4. 开始交易
+#### 4. Start Trading
 
-**测试模式（推荐首次使用）**
+**Test Mode (Recommended for First Use)**
 ```bash
 python run_trader.py --test
 ```
 
-**持续运行（生产模式）**
+**Continuous Run (Production Mode)**
 ```bash
 python run_trader.py
 ```
 
-## 📊 支持的交易对
+## 📊 Supported Trading Pairs
 
-- BNB/USDT (币安币)
-- ETH/USDT (以太坊)
-- BTC/USDT (比特币)
+- BNB/USDT (Binance Coin)
+- ETH/USDT (Ethereum)
+- BTC/USDT (Bitcoin)
 - SOL/USDT (Solana)
-- DOGE/USDT (狗狗币)
+- DOGE/USDT (Dogecoin)
 - ADA/USDT (Cardano)
 
-## 🔧 系统架构
+## 🔧 System Architecture
 
 ```
 trader/
-├── __init__.py              # 模块初始化
-├── binance_client.py        # 币安API客户端
-├── chatgpt_client.py        # ChatGPT API客户端
-├── prediction_analyzer.py   # 预测结果分析器
-├── main_strategy.py         # 主策略逻辑
-└── config.py               # 配置管理
+├── __init__.py              # Module initialization
+├── binance_client.py        # Binance API client
+├── chatgpt_client.py        # ChatGPT API client
+├── prediction_analyzer.py   # Prediction result analyzer
+├── main_strategy.py         # Main strategy logic
+├── state_manager.py         # State management
+├── webui_server.py          # WebUI server
+└── config.py                # Configuration management
 
-run_trader.py               # 启动脚本
-.env.example               # 环境变量模板
-trader_requirements.txt    # 交易系统依赖
+run_trader.py                # Launch script
+.env.example                 # Environment variables template
+trader_requirements.txt      # Trading system dependencies
 ```
 
-## 📈 交易策略流程
+## 📈 Trading Strategy Workflow
 
-1. **价格预测**: 使用Kronos模型预测各币种24小时价格走势
-2. **数据分析**: 计算上涨概率、波动性等关键指标
-3. **自然语言转换**: 将预测结果转换为结构化的分析报告
-4. **智能决策**: ChatGPT分析报告和当前持仓，生成交易建议
-5. **风险评估**: 检查交易建议是否符合风险管理要求
-6. **执行交易**: 自动执行买入/卖出/持有操作
-7. **记录日志**: 保存完整的决策和执行记录
+1. **Price Prediction**: Use Kronos model to forecast 24-hour price movements for each currency
+2. **Data Analysis**: Calculate key metrics including upside probability and volatility
+3. **Natural Language Conversion**: Convert prediction results into structured analysis reports
+4. **Intelligent Decision**: ChatGPT analyzes reports and current positions to generate trading recommendations
+5. **Risk Assessment**: Verify that trading recommendations comply with risk management requirements
+6. **Execute Trades**: Automatically execute buy/sell/hold operations
+7. **Log Recording**: Save complete decision and execution records
 
-## ⚡ 风险管理
+## ⚡ Risk Management
 
-- **最小交易金额**: 默认50 USDT
-- **最大单次交易**: 默认500 USDT
-- **最大总仓位**: 80%的可用资金
-- **单币种限制**: 不超过总资产的30%
-- **止损机制**: 5%止损保护
-- **智能分析**: ChatGPT评估市场风险和机会
+- **Minimum Trade Amount**: Default 50 USDT
+- **Maximum Single Trade**: Default 500 USDT
+- **Maximum Total Position**: 80% of available funds
+- **Single Currency Limit**: No more than 30% of total assets
+- **Stop-Loss Mechanism**: 5% stop-loss protection
+- **Intelligent Analysis**: ChatGPT evaluates market risks and opportunities
 
-## 📋 日志和监控
+## 📋 Logging and Monitoring
 
-系统会在以下位置生成日志：
+The system generates logs in the following locations:
 
-- `logs/kronos_trader.log` - 系统运行日志
-- `data/strategy_logs/` - 策略执行详细记录
+- `logs/kronos_trader.log` - System operation logs
+- `data/strategy_logs/` - Detailed strategy execution records
 
-每次策略执行都会记录：
-- 预测结果和分析
-- ChatGPT交易建议
-- 实际执行的交易操作
-- 风险控制决策
+Each strategy execution records:
+- Prediction results and analysis
+- ChatGPT trading recommendations
+- Actual executed trades
+- Risk control decisions
 
-## ⚠️  重要提醒
+## ⚠️  Important Notes
 
-1. **测试先行**: 首次使用请启用`SIMULATION_MODE=true`进行测试
-2. **资金安全**: 请只投入你能承受损失的资金
-3. **API安全**: 币安API密钥仅需现货交易权限，不要开启其他权限
-4. **网络稳定**: 确保服务器网络稳定，避免因网络问题影响交易
-5. **定期检查**: 建议定期检查系统运行状态和交易结果
+1. **Test First**: Enable `SIMULATION_MODE=true` for testing before live trading
+2. **Capital Safety**: Only invest funds you can afford to lose
+3. **API Security**: Binance API key should only have spot trading permission, do not enable other permissions
+4. **Network Stability**: Ensure server network stability to avoid trading issues due to network problems
+5. **Regular Checks**: Regularly monitor system status and trading results
 
-## 🔍 故障排除
+## 🔍 Troubleshooting
 
-### 常见问题
+### Common Issues
 
-1. **API连接失败**: 检查网络连接和API密钥是否正确
-2. **余额不足**: 确保有足够的USDT用于交易
-3. **预测失败**: 检查Kronos模型文件是否正确下载
-4. **ChatGPT超时**: OpenAI API偶尔会超时，系统会自动重试
+1. **API Connection Failed**: Check network connection and verify API keys are correct
+2. **Insufficient Balance**: Ensure you have enough USDT for trading
+3. **Prediction Failed**: Verify Kronos model files are correctly downloaded
+4. **ChatGPT Timeout**: OpenAI API may occasionally timeout, system will automatically retry
 
-### 查看日志
+### View Logs
 
 ```bash
 tail -f logs/kronos_trader.log
 ```
 
-## 📊 数据来源
+## 📊 Data Sources
 
-- **交易所**: 币安
-- **更新间隔**: 每小时
-- **预测周期**: 24小时
-- **历史数据**: 360个数据点（15天）
+- **Exchange**: Binance
+- **Update Interval**: Hourly
+- **Prediction Horizon**: 24 hours
+- **Historical Data**: 360 data points (15 days)
 
-## 📝 开发说明
+## 📝 Development Notes
 
-本项目包含两个主要组件：
+This project consists of two main components:
 
-1. **Kronos预测仪表板**: 基于Kronos深度学习模型的价格预测可视化系统
-2. **智能交易系统**: 基于预测结果和ChatGPT分析的自动交易系统
+1. **Kronos Prediction Dashboard**: Price prediction visualization system based on Kronos deep learning model
+2. **Intelligent Trading System**: Automated trading system based on prediction results and ChatGPT analysis
 
-核心交易逻辑参考了成熟的量化交易框架，但专门针对AI预测信号进行了优化。
+The core trading logic is inspired by mature quantitative trading frameworks but specifically optimized for AI prediction signals.
 
-### 核心特性
-- 模块化设计，易于扩展
-- 完整的错误处理和重试机制
-- 详细的日志记录
-- 灵活的配置管理
+### Core Features
+- Modular design for easy extension
+- Complete error handling and retry mechanisms
+- Detailed logging
+- Flexible configuration management
 
-## 📄 许可证
+## 📄 License
 
 MIT License
